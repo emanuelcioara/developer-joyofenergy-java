@@ -1,9 +1,13 @@
 package uk.tw.energy.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import io.micrometer.common.util.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,12 +38,12 @@ public class MeterReadingController {
     }
 
     private boolean isMeterReadingsValid(MeterReadings meterReadings) {
+        if (meterReadings == null) {
+            return false;
+        }
         String smartMeterId = meterReadings.smartMeterId();
         List<ElectricityReading> electricityReadings = meterReadings.electricityReadings();
-        return smartMeterId != null
-                && !smartMeterId.isEmpty()
-                && electricityReadings != null
-                && !electricityReadings.isEmpty();
+        return StringUtils.isNotEmpty(smartMeterId) && !CollectionUtils.isEmpty(electricityReadings);
     }
 
     @GetMapping("/read/{smartMeterId}")

@@ -40,9 +40,28 @@ public class MeterReadingControllerTest {
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
     @Test
     public void givenNullReadingsAreSuppliedWhenStoringShouldReturnErrorResponse() {
         MeterReadings meterReadings = new MeterReadings(SMART_METER_ID, null);
+        assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    public void givenNullMeterReadingsWhenStoringShouldReturnErrorResponse() {
+        assertThat(meterReadingController.storeReadings(null).getStatusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @Test
+    public void givenNullSmartMeterIdAndExistingElectricityReadingsWhenStoringShouldReturnErrorResponse() {
+        MeterReadings meterReadings = new MeterReadingsBuilder()
+                .setSmartMeterId(null)
+                .generateElectricityReadings()
+                .build();
+
         assertThat(meterReadingController.storeReadings(meterReadings).getStatusCode())
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -93,4 +112,5 @@ public class MeterReadingControllerTest {
         assertThat(meterReadingController.readReadings(SMART_METER_ID).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
     }
+
 }
