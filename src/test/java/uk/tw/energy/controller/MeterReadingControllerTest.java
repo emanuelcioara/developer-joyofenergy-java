@@ -2,13 +2,15 @@ package uk.tw.energy.controller;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.tw.energy.builders.MeterReadingsBuilder;
 import uk.tw.energy.domain.ElectricityReading;
 import uk.tw.energy.domain.MeterReadings;
@@ -22,7 +24,7 @@ public class MeterReadingControllerTest {
 
     @BeforeEach
     public void setUp() {
-        this.meterReadingService = new MeterReadingService(new HashMap<>());
+        this.meterReadingService = Mockito.mock(MeterReadingService.class);
         this.meterReadingController = new MeterReadingController(meterReadingService);
     }
 
@@ -111,6 +113,18 @@ public class MeterReadingControllerTest {
     public void givenMeterIdThatIsNotRecognisedShouldReturnNotFound() {
         assertThat(meterReadingController.readReadings(SMART_METER_ID).getStatusCode())
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void givenMeterIdThatIsRecognisedAndReadingsEmptyShouldReadings() {
+        Mockito.when(meterReadingService.getReadings(SMART_METER_ID)).thenReturn(Optional.of(Collections.emptyList()));
+
+        ResponseEntity response = meterReadingController.readReadings(SMART_METER_ID);
+
+        assertThat(response.getStatusCode())
+                .isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .isEqualTo(Collections.emptyList());
     }
 
 }
