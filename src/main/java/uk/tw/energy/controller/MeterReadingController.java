@@ -1,6 +1,5 @@
 package uk.tw.energy.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +25,7 @@ public class MeterReadingController {
 
     public MeterReadingController(MeterReadingService meterReadingService) {
         this.meterReadingService = meterReadingService;
+
     }
 
     @PostMapping("/store")
@@ -49,6 +49,7 @@ public class MeterReadingController {
     @GetMapping("/read/{smartMeterId}")
     public ResponseEntity readReadings(@PathVariable String smartMeterId) {
         Optional<List<ElectricityReading>> readings = meterReadingService.getReadings(smartMeterId);
+
         return readings.isPresent()
                 ? ResponseEntity.ok(readings.get())
                 : ResponseEntity.notFound().build();
