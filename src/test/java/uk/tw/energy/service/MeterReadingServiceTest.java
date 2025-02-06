@@ -4,22 +4,26 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import uk.tw.energy.domain.ElectricityReading;
 
 public class MeterReadingServiceTest {
 
     private MeterReadingService meterReadingService;
+    Map<String, List<ElectricityReading>> meterAssociatedReadings;
+    private final static String SMART_METER_ID = "random-id";
+    private List<ElectricityReading> electricityReadings;
+
 
     @BeforeEach
     public void setUp() {
-        meterReadingService = new MeterReadingService(new HashMap<>());
+        meterAssociatedReadings = Mockito.mock(Map.class);
+        meterReadingService = new MeterReadingService(meterAssociatedReadings);
+        electricityReadings = new ArrayList<>();
     }
 
     @Test
@@ -29,8 +33,13 @@ public class MeterReadingServiceTest {
 
     @Test
     public void givenMeterReadingThatExistsShouldReturnMeterReadings() {
-        meterReadingService.storeReadings("random-id", new ArrayList<>());
-        assertThat(meterReadingService.getReadings("random-id")).isEqualTo(Optional.of(new ArrayList<>()));
+        List<ElectricityReading> mockList = Mockito.mock(List.class);
+        Mockito.when(meterAssociatedReadings.computeIfAbsent(Mockito.eq(SMART_METER_ID), Mockito.any())).thenReturn(mockList);
+
+        meterReadingService.storeReadings(SMART_METER_ID, electricityReadings);
+
+        Mockito.verify(meterAssociatedReadings).computeIfAbsent(Mockito.eq(SMART_METER_ID), Mockito.any());
+        Mockito.verify(mockList).addAll(electricityReadings);
     }
 
     @Test

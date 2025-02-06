@@ -1,14 +1,12 @@
 package uk.tw.energy.service;
 
-import java.math.BigDecimal;
-import java.time.Instant;
+import org.springframework.stereotype.Service;
+import uk.tw.energy.domain.ElectricityReading;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
-import uk.tw.energy.domain.ElectricityReading;
-import uk.tw.energy.domain.MeterReadings;
 
 @Service
 public class MeterReadingService {
@@ -24,7 +22,6 @@ public class MeterReadingService {
     }
 
     public void storeReadings(String smartMeterId, List<ElectricityReading> electricityReadings) {
-        meterAssociatedReadings.putIfAbsent(smartMeterId, new ArrayList<>());
-        meterAssociatedReadings.get(smartMeterId).addAll(electricityReadings);
+        meterAssociatedReadings.computeIfAbsent(smartMeterId, val -> new ArrayList<>()).addAll(electricityReadings);
     }
 }
